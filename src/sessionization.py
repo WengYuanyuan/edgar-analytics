@@ -4,37 +4,47 @@ from glob import glob
 import csv
 from datetime import datetime
 import time
-import argparse
 
 from pqdict import pqdict
-
-from utils import get_requests_log, check_request
+from utils import get_requests_log, check_request, tuple_to_str
           
-def tuple_to_str(record, ip, start_time):
-     '''
-      A helper funciton that converts dictionary entry to string for output file
-     Input:
-        tup: dictionary value in tuple
-        key: dictionary key
-        t_base: starting timestamp as a base
-     Return:
-        rslt_str: string in the required format
-     '''
-     start, end = record[0] + start_time, record[1] + start_time
-     start, end = datetime.fromtimestamp(start), datetime.fromtimestamp(end)
-     dt_str = str(int(record[1] - record[0]+1))
-     counts = str(record[2])
-     output = ip+','+str(start)+','+str(end)+','+dt_str+',' + counts
-     return output
      
-if __name__ == '__main__':  
+if __name__ == '__main__':
+    s_time = time.time()
+# if __name__ == "__main__":
+#     argvs = sys.argv
+#     if len(argvs) < 4:
+#         raise Exception("Not enough arguments")    
+# 
+#     log_path, inactive_period_path, output_path = argvs[1:]
+# 
+#     start_time = time.time()  
+#     process_log(log_path, inactive_period_path, output_path)      
+#     elapsed_time = time.time() - start_time
+#     print("completed in {}s".format(round(elapsed_time), 2))  
     
-    inactive_period = open('/Users/quanquan/Documents/insight2/edgar-analytics/insight_testsuite/tests/test_1/input/inactivity_period.txt','r')
+    argvs = sys.argv
+    if len(argvs) < 4:
+        raise Exception("Not enough arguments")    
+
+    log_path, inactive_period_path, output_path = argvs[1:]
+    
+
+
+    inactive_period = open(inactive_period_path,'r')
     inact_period = float(inactive_period.read()[0])
     
+    output_file = open(output_path, 'w')
     
-    output_file = open('/Users/quanquan/Documents/insight2/edgar-analytics/insight_testsuite/tests/test_1/output/sessionization.txt', 'w')
-    requests = iter(get_requests_log('/Users/quanquan/Documents/insight2/edgar-analytics/insight_testsuite/tests/test_1/input/log.csv'))
+    # Use generator to get all the rows from 'log.csv'
+    requests = iter(get_requests_log(log_path))
+    
+    # inactive_period = open('/Users/quanquan/Documents/edgar-analytics/insight_testsuite/tests/test_1/input/inactivity_period.txt','r')
+    # inact_period = float(inactive_period.read()[0])
+    # 
+    # 
+    # output_file = open('/Users/quanquan/Documents/edgar-analytics/insight_testsuite/temp/output/sessionization.txt', 'w')
+    # requests = iter(get_requests_log('/Users/quanquan/Documents/edgar-analytics/insight_testsuite/tests/test_1/input/log.csv'))
     # ingore the head line
     next(requests, None) 
          

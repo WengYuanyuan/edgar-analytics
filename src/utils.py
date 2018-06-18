@@ -30,3 +30,20 @@ def check_request(row):
     else:
           return False
 
+def tuple_to_str(record, ip, start_time):
+     '''
+      A helper funciton that converts dictionary entry to string for output file
+     Input:
+        tup: dictionary value in tuple
+        key: dictionary key
+        t_base: starting timestamp as a base
+     Return:
+        rslt_str: string in the required format
+     '''
+     start, end = record[0] + start_time, record[1] + start_time
+     start, end = datetime.fromtimestamp(start), datetime.fromtimestamp(end)
+     dt_str = str(int(record[1] - record[0]+1))
+     counts = str(record[2])
+     output = ip+','+str(start)+','+str(end)+','+dt_str+',' + counts
+     return output
+
