@@ -1,10 +1,6 @@
-import sys
-import os
-from glob import glob
 import csv
 from datetime import datetime
-import time
-import argparse
+
 
 def get_requests_log(logfile_name):
     '''
