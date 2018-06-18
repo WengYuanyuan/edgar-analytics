@@ -1,4 +1,5 @@
 import sys
+import os
 import csv
 from datetime import datetime
 import time
@@ -17,7 +18,6 @@ if __name__ == '__main__':
     log_path, inactive_period_path, output_path = argvs[1:]
     
 
-
     inactive_period = open(inactive_period_path,'r')
     inact_period = float(inactive_period.read()[0])
     
@@ -26,11 +26,11 @@ if __name__ == '__main__':
     # Use generator to get all the rows from 'log.csv'
     requests = iter(get_requests_log(log_path))
     
-    # ingore the head line
+    # delete the head line
     next(requests, None) 
          
     # use dictionary to track necessary information of currently active sessions.
-    dict_ip = {}
+    dict_ip_sess = {}
     
     # initialize 'indexed' priority queue 
     # for each session, the earlier time_stamp of the last request, the higher priority
@@ -65,24 +65,24 @@ if __name__ == '__main__':
                 if pd.topitem()[1] + inact_period + 1 > cur:
                     break
                 temp_ip = pd.pop()
-                output_file.write("%s\n" % tuple_to_str(dict_ip[temp_ip], temp_ip, start))
-                dict_ip.pop(temp_ip, None)
-        if ip not in dict_ip:
+                output_file.write("%s\n" % tuple_to_str(dict_ip_sess[temp_ip], temp_ip, start))
+                dict_ip_sess.pop(temp_ip, None)
+        if ip not in dict_ip_sess:
             counter = 1
-            dict_ip[ip] = (cur, cur, counter)
+            dict_ip_sess[ip] = (cur, cur, counter)
             pd[ip] = cur
         else:
-            temp = dict_ip[ip]
-            dict_ip[ip] = (temp[0], cur, temp[2]+1)
+            temp = dict_ip_sess[ip]
+            dict_ip_sess[ip] = (temp[0], cur, temp[2]+1)
             pd[ip] = cur
         prev = cur
             
     for key in pd:
-        pd[key]=dict_ip[key][0]
+        pd[key]=dict_ip_sess[key][0]
     
     while len(pd)>0:
         temp_ip = pd.pop()
-        output_file.write("%s\n" % tuple_to_str(dict_ip[temp_ip], temp_ip, start))
+        output_file.write("%s\n" % tuple_to_str(dict_ip_sess[temp_ip], temp_ip, start))
    
     output_file.close()  
     
